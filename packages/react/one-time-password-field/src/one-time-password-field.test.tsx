@@ -22,7 +22,7 @@ describe('given a default OneTimePasswordField', () => {
         <OneTimePasswordField.Input />
         <OneTimePasswordField.Input />
         <OneTimePasswordField.HiddenInput name="code" />
-      </OneTimePasswordField.Root>
+      </OneTimePasswordField.Root>,
     );
   });
 
@@ -37,20 +37,35 @@ describe('given a default OneTimePasswordField', () => {
       <OneTimePasswordField.Root type="password">
         <OneTimePasswordField.Input />
         <OneTimePasswordField.HiddenInput name="code" />
-      </OneTimePasswordField.Root>
+      </OneTimePasswordField.Root>,
     );
 
     const input = rendered.container.querySelector(
-      'input:not([type="hidden"])'
+      'input:not([type="hidden"])',
     ) as HTMLInputElement;
 
     await userEvent.type(input, '1');
     expect(input.type).toBe('password');
 
     const hiddenInput = rendered.container.querySelector(
-      'input[type="hidden"]'
+      'input[type="hidden"]',
     ) as HTMLInputElement;
     expect(hiddenInput.value).toBe('1');
+  });
+
+  it('should disable all inputs when Root is disabled', () => {
+    rendered.rerender(
+      <OneTimePasswordField.Root disabled>
+        <OneTimePasswordField.Input />
+        <OneTimePasswordField.Input />
+        <OneTimePasswordField.HiddenInput name="code" />
+      </OneTimePasswordField.Root>,
+    );
+
+    const inputs = rendered.container.querySelectorAll('input:not([type="hidden"])');
+    inputs.forEach((input) => {
+      expect(input).toBeDisabled();
+    });
   });
 
   // TODO: userEvent paste not behaving as expected. Debug and unskip.

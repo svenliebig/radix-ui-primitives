@@ -219,7 +219,7 @@ const OneTimePasswordField = React.forwardRef<HTMLDivElement, OneTimePasswordFie
       sanitizeValue: sanitizeValueProp,
       ...domProps
     }: ScopedProps<OneTimePasswordFieldProps>,
-    forwardedRef
+    forwardedRef,
   ) {
     const rovingFocusGroupScope = useRovingFocusGroupScope(__scopeOneTimePasswordField);
     const direction = useDirection(dir);
@@ -248,7 +248,7 @@ const OneTimePasswordField = React.forwardRef<HTMLDivElement, OneTimePasswordFie
 
         return value.split('');
       },
-      [validation, sanitizeValueProp]
+      [validation, sanitizeValueProp],
     );
 
     const controlledValue = React.useMemo(() => {
@@ -261,7 +261,7 @@ const OneTimePasswordField = React.forwardRef<HTMLDivElement, OneTimePasswordFie
       defaultProp: defaultValue != null ? sanitizeValue(defaultValue) : [],
       onChange: React.useCallback(
         (value: string[]) => onValueChange?.(value.join('')),
-        [onValueChange]
+        [onValueChange],
       ),
     });
 
@@ -469,7 +469,7 @@ const OneTimePasswordField = React.forwardRef<HTMLDivElement, OneTimePasswordFie
                     event.preventDefault();
                     const pastedValue = event.clipboardData.getData('Text');
                     dispatch({ type: 'PASTE', value: pastedValue });
-                  }
+                  },
                 )}
               >
                 {children}
@@ -479,7 +479,7 @@ const OneTimePasswordField = React.forwardRef<HTMLDivElement, OneTimePasswordFie
         </Collection.Provider>
       </OneTimePasswordFieldContext>
     );
-  }
+  },
 );
 
 /* -------------------------------------------------------------------------------------------------
@@ -504,11 +504,11 @@ const OneTimePasswordFieldHiddenInput = React.forwardRef<
   OneTimePasswordFieldHiddenInputProps
 >(function OneTimePasswordFieldHiddenInput(
   { __scopeOneTimePasswordField, ...props }: ScopedProps<OneTimePasswordFieldHiddenInputProps>,
-  forwardedRef
+  forwardedRef,
 ) {
   const { value, hiddenInputRef, name } = useOneTimePasswordFieldContext(
     'OneTimePasswordFieldHiddenInput',
-    __scopeOneTimePasswordField
+    __scopeOneTimePasswordField,
   );
   const ref = useComposedRefs(hiddenInputRef, forwardedRef);
   return (
@@ -569,7 +569,7 @@ const OneTimePasswordFieldInput = React.forwardRef<
     index: indexProp,
     ...props
   }: ScopedProps<OneTimePasswordFieldInputProps>,
-  forwardedRef
+  forwardedRef,
 ) {
   // TODO: warn if these values are passed
   const {
@@ -588,9 +588,9 @@ const OneTimePasswordFieldInput = React.forwardRef<
 
   const context = useOneTimePasswordFieldContext(
     'OneTimePasswordFieldInput',
-    __scopeOneTimePasswordField
+    __scopeOneTimePasswordField,
   );
-  const { dispatch, userActionRef, validationType, isHydrated } = context;
+  const { dispatch, userActionRef, validationType, isHydrated, disabled } = context;
   const collection = useCollection(__scopeOneTimePasswordField);
   const rovingFocusGroupScope = useRovingFocusGroupScope(__scopeOneTimePasswordField);
 
@@ -612,7 +612,9 @@ const OneTimePasswordFieldInput = React.forwardRef<
   const keyboardActionTimeoutRef = React.useRef<number | null>(null);
   React.useEffect(() => {
     return () => {
-      window.clearTimeout(keyboardActionTimeoutRef.current!);
+      if (keyboardActionTimeoutRef.current) {
+        window.clearTimeout(keyboardActionTimeoutRef.current);
+      }
     };
   }, []);
 
@@ -639,6 +641,7 @@ const OneTimePasswordFieldInput = React.forwardRef<
             <Primitive.Root.input
               ref={composedInputRef}
               type={context.type}
+              disabled={disabled}
               aria-label={`Character ${index + 1} of ${collection.size}`}
               autoComplete={supportsAutoComplete ? context.autoComplete : 'off'}
               data-1p-ignore={supportsAutoComplete ? undefined : 'true'}
@@ -646,7 +649,7 @@ const OneTimePasswordFieldInput = React.forwardRef<
               data-protonpass-ignore={supportsAutoComplete ? undefined : 'true'}
               data-bwignore={supportsAutoComplete ? undefined : 'true'}
               inputMode={validation?.inputMode}
-              maxLength={1}
+              maxLength={supportsAutoComplete ? collection.size : 1}
               pattern={validation?.pattern}
               readOnly={context.readOnly}
               value={char}
@@ -663,11 +666,9 @@ const OneTimePasswordFieldInput = React.forwardRef<
                   // In this case the value will be cleared, but we don't want to
                   // set it directly because the user may want to prevent default
                   // behavior in the onChange handler. The userActionRef will
-                  // is set temporarily so the change handler can behave correctly
+                  // be set temporarily so the change handler can behave correctly
                   // in response to the action.
-                  userActionRef.current = {
-                    type: 'cut',
-                  };
+                  userActionRef.current = { type: 'cut' };
                   // Set a short timeout to clear the action tracker after the change
                   // handler has had time to complete.
                   keyboardActionTimeoutRef.current = window.setTimeout(() => {
@@ -683,7 +684,11 @@ const OneTimePasswordFieldInput = React.forwardRef<
                   // additional input. Handle this the same as if a user were
                   // pasting a value.
                   event.preventDefault();
+                  userActionRef.current = { type: 'autocomplete-paste' };
                   dispatch({ type: 'PASTE', value });
+                  keyboardActionTimeoutRef.current = window.setTimeout(() => {
+                    userActionRef.current = null;
+                  }, 10);
                 }
               })}
               onChange={composeEventHandlers(props.onChange, (event) => {
@@ -695,10 +700,15 @@ const OneTimePasswordFieldInput = React.forwardRef<
                 if (action) {
                   switch (action.type) {
                     case 'cut':
-                      // TODO: do we want to assume the user wantt to clear the
+                      // TODO: do we want to assume the user wants to clear the
                       // entire value here and copy the code to the clipboard instead
                       // of just the value of the given input?
                       dispatch({ type: 'CLEAR_CHAR', index, reason: 'Cut' });
+                      return;
+                    case 'autocomplete-paste':
+                      // the PASTE handler will already set the value and focus the final
+                      // input; we want to skip focusing the wrong element if the browser fires
+                      // onChange for the first input. This sometimes happens during autocomplete.
                       return;
                     case 'keydown': {
                       if (action.key === 'Char') {
@@ -717,6 +727,7 @@ const OneTimePasswordFieldInput = React.forwardRef<
                       return;
                     }
                     default:
+                      action satisfies never;
                       return;
                   }
                 }
@@ -928,7 +939,8 @@ type KeyboardActionDetails =
       metaKey: boolean;
       ctrlKey: boolean;
     }
-  | { type: 'cut' };
+  | { type: 'cut' }
+  | { type: 'autocomplete-paste' };
 
 type UpdateAction =
   | {
