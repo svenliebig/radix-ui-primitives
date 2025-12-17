@@ -1,3 +1,5 @@
+import * as React from 'react';
+import * as ReactDOM from 'react-dom';
 import { clamp } from '@radix-ui/number';
 import { composeEventHandlers } from '@radix-ui/primitive';
 import { createCollection } from '@radix-ui/react-collection';
@@ -19,8 +21,6 @@ import { useLayoutEffect } from '@radix-ui/react-use-layout-effect';
 import { usePrevious } from '@radix-ui/react-use-previous';
 import { VISUALLY_HIDDEN_STYLES } from '@radix-ui/react-visually-hidden';
 import { hideOthers } from 'aria-hidden';
-import * as React from 'react';
-import * as ReactDOM from 'react-dom';
 import { RemoveScroll } from 'react-remove-scroll';
 
 import type { Scope } from '@radix-ui/react-context';
@@ -384,7 +384,7 @@ const SelectValue = React.forwardRef<SelectValueElement, SelectValueProps>(
         // through the item they came from
         style={{ pointerEvents: 'none' }}
       >
-        {shouldShowPlaceholder(context.value) ? <>{placeholder}</> : children}
+        {children}
       </Primitive.span>
     );
   },
@@ -1279,12 +1279,6 @@ const SelectItem = React.forwardRef<SelectItemElement, SelectItemProps>(
       }
     };
 
-    if (value === '') {
-      throw new Error(
-        'A <Select.Item /> must have a value prop that is not an empty string. This is because the Select value can be set to an empty string to clear the selection and show the placeholder.',
-      );
-    }
-
     return (
       <SelectItemContextProvider
         itemKey={itemKey}
@@ -1791,17 +1785,57 @@ const Separator = SelectSeparator;
 const Arrow = SelectArrow;
 
 export {
-  Arrow, Content, createSelectScope, Group, Icon, Item, ItemIndicator, ItemText, Label, Portal,
+  createSelectScope,
   //
-  Root, ScrollDownButton, ScrollUpButton,
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectIcon,
+  SelectPortal,
+  SelectContent,
+  SelectViewport,
+  SelectGroup,
+  SelectLabel,
+  SelectItem,
+  SelectItemText,
+  SelectItemIndicator,
+  SelectScrollUpButton,
+  SelectScrollDownButton,
+  SelectSeparator,
+  SelectArrow,
   //
-  Select, SelectArrow, SelectContent, SelectGroup, SelectIcon, SelectItem, SelectItemIndicator, SelectItemText, SelectLabel, SelectPortal, SelectScrollDownButton, SelectScrollUpButton, SelectSeparator, SelectTrigger,
-  SelectValue, SelectViewport, Separator, Trigger,
-  Value, Viewport
+  Root,
+  Trigger,
+  Value,
+  Icon,
+  Portal,
+  Content,
+  Viewport,
+  Group,
+  Label,
+  Item,
+  ItemText,
+  ItemIndicator,
+  ScrollUpButton,
+  ScrollDownButton,
+  Separator,
+  Arrow,
 };
 export type {
-  SelectArrowProps, SelectContentProps, SelectGroupProps, SelectIconProps, SelectItemIndicatorProps, SelectItemProps,
-  SelectItemTextProps, SelectLabelProps, SelectPortalProps, SelectProps, SelectScrollDownButtonProps, SelectScrollUpButtonProps, SelectSeparatorProps, SelectTriggerProps,
-  SelectValueProps, SelectViewportProps
+  SelectProps,
+  SelectTriggerProps,
+  SelectValueProps,
+  SelectIconProps,
+  SelectPortalProps,
+  SelectContentProps,
+  SelectViewportProps,
+  SelectGroupProps,
+  SelectLabelProps,
+  SelectItemProps,
+  SelectItemTextProps,
+  SelectItemIndicatorProps,
+  SelectScrollUpButtonProps,
+  SelectScrollDownButtonProps,
+  SelectSeparatorProps,
+  SelectArrowProps,
 };
-
