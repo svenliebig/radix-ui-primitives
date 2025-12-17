@@ -1,5 +1,3 @@
-import * as React from 'react';
-import * as ReactDOM from 'react-dom';
 import { clamp } from '@radix-ui/number';
 import { composeEventHandlers } from '@radix-ui/primitive';
 import { createCollection } from '@radix-ui/react-collection';
@@ -21,6 +19,8 @@ import { useLayoutEffect } from '@radix-ui/react-use-layout-effect';
 import { usePrevious } from '@radix-ui/react-use-previous';
 import { VISUALLY_HIDDEN_STYLES } from '@radix-ui/react-visually-hidden';
 import { hideOthers } from 'aria-hidden';
+import * as React from 'react';
+import * as ReactDOM from 'react-dom';
 import { RemoveScroll } from 'react-remove-scroll';
 
 import type { Scope } from '@radix-ui/react-context';
@@ -1383,11 +1383,15 @@ const SelectItemText = React.forwardRef<SelectItemTextElement, SelectItemTextPro
     const textContent = itemTextNode?.textContent;
     const nativeOption = React.useMemo(
       () => (
-        <option key={itemContext.itemKey ?? itemContext.value} value={itemContext.value} disabled={itemContext.disabled}>
+        <option
+          key={itemContext.itemKey ?? itemContext.value}
+          value={itemContext.value}
+          disabled={itemContext.disabled}
+        >
           {textContent}
         </option>
       ),
-      [itemContext.disabled, itemContext.itemKey, itemContext.value, textContent]
+      [itemContext.disabled, itemContext.itemKey, itemContext.value, textContent],
     );
 
     const { onNativeOptionAdd, onNativeOptionRemove } = nativeOptionsContext;
@@ -1785,57 +1789,57 @@ const Separator = SelectSeparator;
 const Arrow = SelectArrow;
 
 export {
+  Arrow,
+  Content,
   createSelectScope,
-  //
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectIcon,
-  SelectPortal,
-  SelectContent,
-  SelectViewport,
-  SelectGroup,
-  SelectLabel,
-  SelectItem,
-  SelectItemText,
-  SelectItemIndicator,
-  SelectScrollUpButton,
-  SelectScrollDownButton,
-  SelectSeparator,
-  SelectArrow,
+  Group,
+  Icon,
+  Item,
+  ItemIndicator,
+  ItemText,
+  Label,
+  Portal,
   //
   Root,
+  ScrollDownButton,
+  ScrollUpButton,
+  //
+  Select,
+  SelectArrow,
+  SelectContent,
+  SelectGroup,
+  SelectIcon,
+  SelectItem,
+  SelectItemIndicator,
+  SelectItemText,
+  SelectLabel,
+  SelectPortal,
+  SelectScrollDownButton,
+  SelectScrollUpButton,
+  SelectSeparator,
+  SelectTrigger,
+  SelectValue,
+  SelectViewport,
+  Separator,
   Trigger,
   Value,
-  Icon,
-  Portal,
-  Content,
   Viewport,
-  Group,
-  Label,
-  Item,
-  ItemText,
-  ItemIndicator,
-  ScrollUpButton,
-  ScrollDownButton,
-  Separator,
-  Arrow,
 };
 export type {
-  SelectProps,
-  SelectTriggerProps,
-  SelectValueProps,
-  SelectIconProps,
-  SelectPortalProps,
+  SelectArrowProps,
   SelectContentProps,
-  SelectViewportProps,
   SelectGroupProps,
-  SelectLabelProps,
+  SelectIconProps,
+  SelectItemIndicatorProps,
   SelectItemProps,
   SelectItemTextProps,
-  SelectItemIndicatorProps,
-  SelectScrollUpButtonProps,
+  SelectLabelProps,
+  SelectPortalProps,
+  SelectProps,
   SelectScrollDownButtonProps,
+  SelectScrollUpButtonProps,
   SelectSeparatorProps,
-  SelectArrowProps,
+  SelectTriggerProps,
+  SelectValueProps,
+  SelectViewportProps,
 };
